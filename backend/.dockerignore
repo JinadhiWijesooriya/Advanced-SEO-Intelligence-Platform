@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test & coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# SQLite databases
+*.db
+*.sqlite3
+
+# Alembic version files (optional — remove if you want migrations tracked)
+# alembic/versions/
+
+# Environment files
+.env
+
+# Storage / uploads
+storage/
+
+# IDE
+.idea/
+.vscode/
+*.swp
