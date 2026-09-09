@@ -391,3 +391,191 @@ export const fetchCrawlTasks = async (
   const response = await apiClient.get<CrawlTaskListResponse>(`/v1/crawls/${crawlId}/tasks`, { params });
   return response.data;
 };
+
+// =====================================================
+// Phase 8: Historical Snapshots, Competitors, Schedules
+// =====================================================
+
+export interface AuditSnapshot {
+  id: number;
+  project_id: number;
+  crawl_job_id: number;
+  overall_score: number;
+  technical_score: number;
+  onpage_score: number;
+  content_score: number;
+  link_score: number;
+  performance_score: number;
+  mobile_score: number;
+  issue_count: number;
+  critical_issues: number;
+  high_issues: number;
+  medium_issues: number;
+  low_issues: number;
+  page_count: number;
+  created_at: string;
+}
+
+export interface Competitor {
+  id: number;
+  project_id: number;
+  name: string;
+  domain: string;
+  target_url: string;
+  latest_score: number | null;
+  latest_page_count: number | null;
+  latest_issue_count: number | null;
+  latest_crawl_job_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompetitorCreateInput {
+  name: string;
+  domain: string;
+  target_url: string;
+  project_id: number;
+}
+
+export interface ScheduledScan {
+  id: number;
+  project_id: number;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  enabled: boolean;
+  next_run_at: string | null;
+  last_run_at: string | null;
+  created_at: string;
+}
+
+export interface ScheduledScanInput {
+  frequency: 'daily' | 'weekly' | 'monthly';
+  enabled: boolean;
+  project_id: number;
+}
+
+export const fetchAuditHistory = async (projectId: number): Promise<AuditSnapshot[]> => {
+  const response = await apiClient.get<AuditSnapshot[]>(`/v1/projects/${projectId}/snapshots`);
+  return response.data;
+};
+
+export const fetchCompetitors = async (projectId: number): Promise<Competitor[]> => {
+  const response = await apiClient.get<Competitor[]>(`/v1/projects/${projectId}/competitors`);
+  return response.data;
+};
+
+export const addCompetitor = async (data: CompetitorCreateInput): Promise<Competitor> => {
+  const response = await apiClient.post<Competitor>(`/v1/projects/${data.project_id}/competitors`, data);
+  return response.data;
+};
+
+export const deleteCompetitor = async (competitorId: number): Promise<void> => {
+  await apiClient.delete(`/v1/competitors/${competitorId}`);
+};
+
+export const auditCompetitor = async (competitorId: number): Promise<{ crawl_job_id: number }> => {
+  const response = await apiClient.post(`/v1/competitors/${competitorId}/audit`);
+  return response.data;
+};
+
+export const fetchSchedule = async (projectId: number): Promise<ScheduledScan | null> => {
+  try {
+    const response = await apiClient.get<ScheduledScan>(`/v1/projects/${projectId}/schedule`);
+    return response.data;
+  } catch {
+    return null;
+  }
+};
+
+export const upsertSchedule = async (projectId: number, data: ScheduledScanInput): Promise<ScheduledScan> => {
+  const response = await apiClient.post<ScheduledScan>(`/v1/projects/${projectId}/schedule`, data);
+  return response.data;
+};
+
+// =====================================================
+// Phase 9: Reports & Notifications
+// =====================================================
+
+export interface Report {
+  id: number;
+  project_id: number;
+  crawl_job_id: number | null;
+  format: 'json' | 'csv' | 'pdf';
+  file_path: string | null;
+  status: 'pending' | 'completed' | 'failed';
+  created_at: string;
+}
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  type: string;
+  message: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export const createReport = async (projectId: number, format: string): Promise<Report> => {
+  const response = await apiClient.post<Report>(`/v1/projects/${projectId}/reports`, {
+    format,
+    project_id: projectId,
+  });
+  return response.data;
+};
+
+export const fetchReports = async (projectId: number): Promise<Report[]> => {
+  const response = await apiClient.get<Report[]>(`/v1/projects/${projectId}/reports`);
+  return response.data;
+};
+
+export const deleteReport = async (reportId: number): Promise<void> => {
+  await apiClient.delete(`/v1/reports/${reportId}`);
+};
+
+export const getReportDownloadUrl = (reportId: number): string => {
+  const token = localStorage.getItem('seo_access_token');
+  return `${apiClient.defaults.baseURL}/v1/reports/${reportId}/download?token=${token}`;
+};
+
+export const downloadReport = async (reportId: number): Promise<void> => {
+  const token = localStorage.getItem('seo_access_token');
+  const response = await apiClient.get(`/v1/reports/${reportId}/download`, {
+    responseType: 'blob',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  const cd = response.headers['content-disposition'] || '';
+  const filename = cd.split('filename=')[1]?.replace(/"/g, '') || `report_${reportId}`;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+export const fetchNotifications = async (unreadOnly = false): Promise<Notification[]> => {
+  const response = await apiClient.get<Notification[]>('/v1/notifications', {
+    params: { unread_only: unreadOnly },
+  });
+  return response.data;
+};
+
+export const fetchUnreadCount = async (): Promise<number> => {
+  const response = await apiClient.get<{ unread_count: number }>('/v1/notifications/unread-count');
+  return response.data.unread_count;
+};
+
+export const markNotificationRead = async (id: number): Promise<Notification> => {
+  const response = await apiClient.put<Notification>(`/v1/notifications/${id}/read`);
+  return response.data;
+};
+
+export const markAllNotificationsRead = async (): Promise<{ marked_read: number }> => {
+  const response = await apiClient.put('/v1/notifications/read-all');
+  return response.data;
+};
+
+export const deleteNotification = async (id: number): Promise<void> => {
+  await apiClient.delete(`/v1/notifications/${id}`);
+};

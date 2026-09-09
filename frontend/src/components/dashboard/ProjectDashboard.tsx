@@ -26,7 +26,25 @@ import {
   ArrowRight,
   HelpCircle,
   ExternalLink,
+  TrendingUp,
+  Target,
+  Clock,
+  Download,
 } from 'lucide-react';
+import { HistoryView } from '../history/HistoryView';
+import { CompetitorView } from '../competitors/CompetitorView';
+import { SchedulePanel } from '../schedule/SchedulePanel';
+import { ReportsPanel } from '../reports/ReportsPanel';
+
+type DashboardTab = 'overview' | 'history' | 'competitors' | 'schedule' | 'reports';
+
+const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
+  { id: 'overview', label: 'Overview', icon: <Activity className="w-3.5 h-3.5" /> },
+  { id: 'history', label: 'History', icon: <TrendingUp className="w-3.5 h-3.5" /> },
+  { id: 'competitors', label: 'Competitors', icon: <Target className="w-3.5 h-3.5" /> },
+  { id: 'schedule', label: 'Schedule', icon: <Clock className="w-3.5 h-3.5" /> },
+  { id: 'reports', label: 'Reports', icon: <Download className="w-3.5 h-3.5" /> },
+];
 
 interface ProjectDashboardProps {
   project: Project;
@@ -45,6 +63,7 @@ export const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
 
   const loadSummary = async () => {
     try {
@@ -524,6 +543,58 @@ export const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Phase 8 & 9 Intelligence Tabs */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
+        {/* Tab Navigation */}
+        <div className="flex items-center gap-0.5 p-1.5 border-b border-slate-800 bg-slate-900/40 overflow-x-auto">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                activeTab === tab.id
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Panels */}
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="text-center py-8 space-y-3">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+              <p className="text-white font-semibold">Audit Overview displayed above</p>
+              <p className="text-slate-400 text-sm">Scroll up to view scores, categories, and top issues.</p>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button
+                  onClick={() => onViewPages(project)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-all"
+                >
+                  <FileText className="w-3.5 h-3.5 text-blue-400" />
+                  Browse Pages
+                </button>
+                <button
+                  onClick={() => onViewIssues(project)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  View Issues
+                </button>
+              </div>
+            </div>
+          )}
+          {activeTab === 'history' && <HistoryView projectId={project.id} />}
+          {activeTab === 'competitors' && <CompetitorView project={project} />}
+          {activeTab === 'schedule' && <SchedulePanel projectId={project.id} />}
+          {activeTab === 'reports' && <ReportsPanel projectId={project.id} />}
+        </div>
       </div>
     </div>
   );

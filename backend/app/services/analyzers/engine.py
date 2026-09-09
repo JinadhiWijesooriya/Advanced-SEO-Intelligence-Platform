@@ -103,30 +103,61 @@ class SEOAnalyzerEngine:
             from app.services.scoring_engine import SEOScoringEngine
             scorer = SEOScoringEngine(self.db)
             scorer.calculate_and_save_crawl_scores(crawl_job_id, project_id)
-            
-            # Phase 8: Generate Audit Snapshot
+
+            # Phase 8: Generate Audit Snapshot (using correct model field names)
             summary = scorer.get_project_seo_summary(project_id)
             from app.models.audit_snapshot import AuditSnapshot
+            by_sev = summary["issue_counts"]["by_severity"]
             snapshot = AuditSnapshot(
                 project_id=project_id,
-                snapshot_type="post_crawl",
-                score_technical=summary["category_scores"]["technical"],
-                score_onpage=summary["category_scores"]["onpage"],
-                score_content=summary["category_scores"]["content"],
-                score_links=summary["category_scores"]["link"],
-                score_performance=summary["category_scores"]["performance"],
-                score_mobile=summary["category_scores"]["mobile"],
+                crawl_job_id=crawl_job_id,
                 overall_score=summary["overall_score"],
-                metrics_summary={"audited_pages": summary["audited_pages"]},
-                issues_summary=summary["issue_counts"]["by_severity"]
+                technical_score=summary["category_scores"]["technical"],
+                onpage_score=summary["category_scores"]["onpage"],
+                content_score=summary["category_scores"]["content"],
+                link_score=summary["category_scores"]["link"],
+                performance_score=summary["category_scores"]["performance"],
+                mobile_score=summary["category_scores"]["mobile"],
+                issue_count=summary["issue_counts"]["total"],
+                critical_issues=by_sev.get("critical", 0),
+                high_issues=by_sev.get("high", 0),
+                medium_issues=by_sev.get("medium", 0),
+                low_issues=by_sev.get("low", 0),
+                page_count=summary["audited_pages"],
             )
             self.db.add(snapshot)
             self.db.commit()
+
+            # Phase 9: Create in-app Notification for the project owner
+            try:
+                from app.models.project import Project
+                from app.models.notification import Notification
+                project = self.db.query(Project).filter(Project.id == project_id).first()
+                if project:
+                    grade = summary["health_grade"]
+                    score = summary["overall_score"]
+                    notif = Notification(
+                        user_id=project.user_id,
+                        type="crawl_complete",
+                        message=(
+                            f"Crawl completed for \"{project.name}\". "
+                            f"Overall SEO score: {score}/100 (Grade {grade}). "
+                            f"{summary['issue_counts']['total']} issues found across "
+                            f"{summary['audited_pages']} pages."
+                        ),
+                    )
+                    self.db.add(notif)
+                    self.db.commit()
+            except Exception as notif_err:
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to create notification for crawl {crawl_job_id}: {notif_err}")
+
         except Exception as e:
             import logging
             logging.getLogger(__name__).error(f"Failed to calculate scores or snapshots for crawl {crawl_job_id}: {e}")
 
         return issue_count
+
 
     # ------------------------------------------------------------------
     # Site-wide duplicate detection helpers

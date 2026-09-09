@@ -8,6 +8,7 @@ import { CrawlMonitor } from './components/crawl/CrawlMonitor';
 import { PageList } from './components/pages/PageList';
 import { IssueList } from './components/issues/IssueList';
 import { ProjectDashboard } from './components/dashboard/ProjectDashboard';
+import { NotificationBell } from './components/notifications/NotificationBell';
 import { 
   fetchSystemHealth, 
   fetchProjects, 
@@ -168,7 +169,7 @@ const DashboardContent: React.FC = () => {
             </div>
             <div>
               <h1 className="font-bold text-lg text-white tracking-wide">SEO Intelligence Platform</h1>
-              <p className="text-xs text-slate-400">Phase 7 • Background Jobs & Distributed Workers (Redis + Celery)</p>
+              <p className="text-xs text-slate-400">Phase 9 • Reports, Notifications & Intelligence Suite</p>
             </div>
           </div>
 
@@ -179,7 +180,9 @@ const DashboardContent: React.FC = () => {
             </div>
 
             {isAuthenticated && user ? (
-              <div className="flex items-center space-x-3 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-1.5">
+              <div className="flex items-center space-x-3">
+                <NotificationBell />
+                <div className="flex items-center space-x-3 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-1.5">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-md">
                   {user.email.charAt(0).toUpperCase()}
                 </div>
@@ -194,6 +197,7 @@ const DashboardContent: React.FC = () => {
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
+              </div>
               </div>
             ) : (
               <div className="flex items-center space-x-2 bg-slate-800/60 p-1 rounded-xl border border-slate-700/60 text-xs">
@@ -559,12 +563,34 @@ const DashboardContent: React.FC = () => {
                   <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
                 </div>
 
+                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <div>
+                      <h4 className="font-semibold text-sm text-white">Phase 7: Background Jobs & Distributed Processing</h4>
+                      <p className="text-xs text-slate-400">Celery distributed crawl tasks, Redis broker integration, crawl_tasks per-URL tracking, exponential backoff retries, and live worker queue activity drawer.</p>
+                    </div>
+                  </div>
+                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <div>
+                      <h4 className="font-semibold text-sm text-white">Phase 8: Historical Snapshots, Competitor Intelligence & Scheduled Audits</h4>
+                      <p className="text-xs text-slate-400">Immutable audit snapshots with score trend tracking, multi-domain competitor benchmarking, and Celery Beat scheduled recurring scan automation.</p>
+                    </div>
+                  </div>
+                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
+                </div>
+
                 <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-indigo-500/30">
                   <div className="flex items-center space-x-3">
                     <CheckCircle2 className="w-5 h-5 text-indigo-400" />
                     <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 7: Background Jobs & Distributed Processing (Current)</h4>
-                      <p className="text-xs text-slate-400">Celery distributed crawl tasks, Redis broker integration, crawl_tasks per-URL tracking, exponential backoff retries, and live worker queue activity drawer.</p>
+                      <h4 className="font-semibold text-sm text-white">Phase 9: Reports, Notifications & Intelligence Suite (Current)</h4>
+                      <p className="text-xs text-slate-400">PDF/CSV/JSON report generation via ReportLab, in-app notification bell with crawl-complete alerts, competitor benchmarking UI, audit history charts, and scheduled scan configuration panel.</p>
                     </div>
                   </div>
                   <span className="text-xs px-3 py-1 bg-indigo-500/10 text-indigo-400 rounded-full font-medium border border-indigo-500/20">Active</span>
