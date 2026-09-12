@@ -1,5 +1,8 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, auth, projects, crawls, issues, seo, snapshots, competitors, schedules, reports, notifications
+from app.api.v1.endpoints import (
+    health, auth, projects, crawls, issues, seo,
+    snapshots, competitors, schedules, reports, notifications, ai,
+)
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
@@ -13,4 +16,5 @@ api_router.include_router(competitors.router, tags=["Competitor Analysis"])
 api_router.include_router(schedules.router, tags=["Scheduled Scans"])
 api_router.include_router(reports.router, tags=["Reports"])
 api_router.include_router(notifications.router, tags=["Notifications"])
+api_router.include_router(ai.router, tags=["AI Intelligence"])
 

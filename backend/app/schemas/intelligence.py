@@ -1,4 +1,4 @@
-﻿from typing import Optional, List
+from typing import Optional, List, Literal
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -80,7 +80,7 @@ class Competitor(CompetitorBase):
 # ---------------------------------------------------------------------------
 
 class ScheduledScanBase(BaseModel):
-    frequency: str = Field(..., description="'daily', 'weekly', 'monthly'")
+    frequency: Literal["daily", "weekly", "monthly"] = Field(..., description="'daily', 'weekly', 'monthly'")
     enabled: bool = True
 
 
@@ -89,7 +89,7 @@ class ScheduledScanCreate(ScheduledScanBase):
 
 
 class ScheduledScanUpdate(BaseModel):
-    frequency: Optional[str] = None
+    frequency: Optional[Literal["daily", "weekly", "monthly"]] = None
     enabled: Optional[bool] = None
     next_run_at: Optional[datetime] = None
 

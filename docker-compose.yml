@@ -16,6 +16,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   # ─────────────────────────────────────────
   # Backend — FastAPI API server
@@ -35,20 +40,32 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - USE_CELERY=true
+      - LOG_FORMAT=json
+      - LOG_LEVEL=INFO
+      - TZ=UTC
     volumes:
       - backend_storage:/app/storage
     depends_on:
       redis:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512m
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/api/v1/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # ─────────────────────────────────────────
-  # Celery Worker — background tasks
+  # Celery Worker — background crawl tasks
   # ─────────────────────────────────────────
   celery_worker:
     build:
@@ -64,6 +81,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - USE_CELERY=true
+      - TZ=UTC
     volumes:
       - backend_storage:/app/storage
     depends_on:
@@ -71,6 +89,46 @@ services:
         condition: service_healthy
       backend:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # ─────────────────────────────────────────
+  # Celery Beat — scheduled scan executor (Phase 8 + 10)
+  # ─────────────────────────────────────────
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: seo_celery_beat
+    restart: unless-stopped
+    command: celery -A app.workers.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=sqlite:////app/storage/seo_platform.db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - USE_CELERY=true
+      - TZ=UTC
+    volumes:
+      - backend_storage:/app/storage
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   # ─────────────────────────────────────────
   # Frontend — React app served by Nginx
@@ -85,6 +143,11 @@ services:
       - "80:80"
     depends_on:
       - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
 
 volumes:
   redis_data:

@@ -35,8 +35,9 @@ import { HistoryView } from '../history/HistoryView';
 import { CompetitorView } from '../competitors/CompetitorView';
 import { SchedulePanel } from '../schedule/SchedulePanel';
 import { ReportsPanel } from '../reports/ReportsPanel';
+import { AIRecommendationsPanel } from '../ai/AIRecommendationsPanel';
 
-type DashboardTab = 'overview' | 'history' | 'competitors' | 'schedule' | 'reports';
+type DashboardTab = 'overview' | 'history' | 'competitors' | 'schedule' | 'reports' | 'ai';
 
 const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <Activity className="w-3.5 h-3.5" /> },
@@ -44,6 +45,7 @@ const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: 'competitors', label: 'Competitors', icon: <Target className="w-3.5 h-3.5" /> },
   { id: 'schedule', label: 'Schedule', icon: <Clock className="w-3.5 h-3.5" /> },
   { id: 'reports', label: 'Reports', icon: <Download className="w-3.5 h-3.5" /> },
+  { id: 'ai', label: 'AI Intelligence', icon: <span className="text-violet-400">✦</span> },
 ];
 
 interface ProjectDashboardProps {
@@ -594,6 +596,7 @@ export const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
           {activeTab === 'competitors' && <CompetitorView project={project} />}
           {activeTab === 'schedule' && <SchedulePanel projectId={project.id} />}
           {activeTab === 'reports' && <ReportsPanel projectId={project.id} />}
+          {activeTab === 'ai' && <AIRecommendationsPanel projectId={project.id} />}
         </div>
       </div>
     </div>

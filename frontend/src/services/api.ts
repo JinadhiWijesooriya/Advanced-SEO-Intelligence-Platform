@@ -579,3 +579,81 @@ export const markAllNotificationsRead = async (): Promise<{ marked_read: number 
 export const deleteNotification = async (id: number): Promise<void> => {
   await apiClient.delete(`/v1/notifications/${id}`);
 };
+
+// =====================================================
+// Phase 10: AI Intelligence
+// =====================================================
+
+export interface AISuggestion {
+  id: string;
+  category: string;
+  priority: 'critical' | 'high' | 'medium' | 'quick_win';
+  title: string;
+  description: string;
+  action: string;
+  impact_estimate: string;
+  affected_pages: number;
+  affected_urls: string[];
+  ai_enhanced: boolean;
+  openai_detail: string | null;
+}
+
+export interface AIRecommendationsResponse {
+  project_id: number;
+  ai_mode: 'openai' | 'rule-based';
+  total_suggestions: number;
+  suggestions: AISuggestion[];
+}
+
+export interface ContentGapPage {
+  url: string;
+  detail: string;
+}
+
+export interface ContentGap {
+  id: string;
+  gap_type: string;
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  recommendation: string;
+  affected_count: number;
+  pages: ContentGapPage[];
+}
+
+export interface ContentGapReportResponse {
+  project_id: number;
+  total_pages_analyzed: number;
+  thin_content_count: number;
+  missing_h1_count: number;
+  cannibalization_clusters: number;
+  content_health_score: number;
+  gaps: ContentGap[];
+}
+
+export const fetchAIRecommendations = async (
+  projectId: number
+): Promise<AIRecommendationsResponse> => {
+  const response = await apiClient.get<AIRecommendationsResponse>(
+    `/v1/projects/${projectId}/ai-recommendations`
+  );
+  return response.data;
+};
+
+export const regenerateAIRecommendations = async (
+  projectId: number
+): Promise<AIRecommendationsResponse> => {
+  const response = await apiClient.post<AIRecommendationsResponse>(
+    `/v1/projects/${projectId}/ai-recommendations/regenerate`
+  );
+  return response.data;
+};
+
+export const fetchContentGaps = async (
+  projectId: number
+): Promise<ContentGapReportResponse> => {
+  const response = await apiClient.get<ContentGapReportResponse>(
+    `/v1/projects/${projectId}/content-gaps`
+  );
+  return response.data;
+};

@@ -26,6 +26,7 @@ backend/.env
 
 # Storage volumes
 backend/storage/
+storage/
 
 # Node
 node_modules/
