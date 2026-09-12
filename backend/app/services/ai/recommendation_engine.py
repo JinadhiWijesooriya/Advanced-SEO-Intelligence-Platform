@@ -18,7 +18,7 @@ from collections import defaultdict, Counter
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.crawl_job import CrawlJob
 from app.models.page import Page
@@ -259,10 +259,16 @@ class AIRecommendationEngine:
                 # Fallback for codes not in catalogue
                 blueprint = self._generate_fallback_blueprint(code, group[0])
 
-            # Collect affected URLs (first 10)
-            affected_urls = [
-                iss.page_url for iss in group if iss.page_url
-            ][:10]
+            # Collect affected URLs (first 10 unique URLs)
+            affected_urls: List[str] = []
+            for iss in group:
+                url = getattr(iss, "page_url", None)
+                if not url and getattr(iss, "page", None):
+                    url = getattr(iss.page, "url", None)
+                if url and url not in affected_urls:
+                    affected_urls.append(url)
+                if len(affected_urls) >= 10:
+                    break
 
             impact_key = blueprint.get("impact_key", "")
             impact_label = _IMPACT_LABELS.get(impact_key, "🟡 SEO impact")
@@ -396,6 +402,7 @@ class AIRecommendationEngine:
     def _load_open_issues(self, crawl_job_id: int) -> List[SEOIssue]:
         return (
             self.db.query(SEOIssue)
+            .options(joinedload(SEOIssue.page))
             .filter(SEOIssue.crawl_job_id == crawl_job_id, SEOIssue.status == "open")
             .all()
         )

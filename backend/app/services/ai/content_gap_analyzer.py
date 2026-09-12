@@ -177,10 +177,15 @@ class ContentGapAnalyzer:
             if page.status_code != 200:
                 continue
             h1_tags = []
-            try:
-                h1_tags = json.loads(page.h1_tags) if page.h1_tags else []
-            except (json.JSONDecodeError, TypeError):
-                pass
+            if page.h1_tags:
+                try:
+                    parsed = json.loads(page.h1_tags)
+                    if isinstance(parsed, list):
+                        h1_tags = [str(t).strip() for t in parsed if str(t).strip()]
+                    elif isinstance(parsed, str) and parsed.strip():
+                        h1_tags = [parsed.strip()]
+                except Exception:
+                    h1_tags = [h.strip() for h in page.h1_tags.split("\n") if h.strip()]
 
             if not h1_tags:
                 problem_pages.append({"url": page.url, "detail": "No H1 tag found"})

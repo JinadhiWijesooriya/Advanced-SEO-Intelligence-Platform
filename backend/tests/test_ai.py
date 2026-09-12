@@ -273,3 +273,61 @@ class TestAIEndpoints:
         data = resp.json()
         assert "suggestions" in data
         assert "ai_mode" in data
+
+    def test_ai_recommendations_with_real_db_crawl_and_issues(self):
+        """Verify AI recommendations when real DB SEOIssue and Page records exist."""
+        from app.core.database import SessionLocal
+        from app.models.crawl_job import CrawlJob
+        from app.models.page import Page
+        from app.models.seo_issue import SEOIssue
+
+        headers = register_and_login()
+        project_id = create_project(headers)
+
+        db = SessionLocal()
+        try:
+            job = CrawlJob(
+                project_id=project_id,
+                status="completed",
+                total_urls=1,
+                processed_urls=1,
+            )
+            db.add(job)
+            db.commit()
+            db.refresh(job)
+
+            page = Page(
+                project_id=project_id,
+                crawl_job_id=job.id,
+                url="https://example.com/blog/test-article",
+                status_code=200,
+                word_count=150,
+                depth=1,
+            )
+            db.add(page)
+            db.commit()
+            db.refresh(page)
+
+            issue = SEOIssue(
+                project_id=project_id,
+                crawl_job_id=job.id,
+                page_id=page.id,
+                category="onpage",
+                severity="high",
+                code="MISSING_TITLE",
+                message="Page is missing a title tag",
+                recommendation="Add a title tag",
+                status="open",
+            )
+            db.add(issue)
+            db.commit()
+        finally:
+            db.close()
+
+        resp = client.get(f"/api/v1/projects/{project_id}/ai-recommendations", headers=headers)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total_suggestions"] >= 1
+        sug = next(s for s in data["suggestions"] if "title" in s["id"].lower())
+        assert "https://example.com/blog/test-article" in sug["affected_urls"]
+
