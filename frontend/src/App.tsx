@@ -20,7 +20,6 @@ import {
 import type { HealthResponse, Project, ProjectCreateInput, CrawlJob } from './services/api';
 import { 
   Activity, 
-  CheckCircle2, 
   Server, 
   RefreshCw, 
   ShieldCheck, 
@@ -488,126 +487,6 @@ const DashboardContent: React.FC = () => {
               onSave={handleSaveProject}
               projectToEdit={editingProject}
             />
-
-            {/* Development Roadmap Status */}
-            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-6">
-              <div>
-                <h3 className="font-bold text-xl text-white">Development Roadmap Status</h3>
-                <p className="text-xs text-slate-400 mt-1">Incremental Phase Execution</p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 1: Foundation</h4>
-                      <p className="text-xs text-slate-400">Monorepo setup, FastAPI backend, React + TypeScript + Tailwind frontend, SQLite database schema.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 2: Authentication</h4>
-                      <p className="text-xs text-slate-400">User Registration, Login, JWT Tokens, Password Hashing, Protected Routes.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 3: Projects & SSRF Protection</h4>
-                      <p className="text-xs text-slate-400">Create website projects, crawl limits, crawl depth, project settings, URL validation & SSRF protection.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 4: Basic Crawler & Page Storage</h4>
-                      <p className="text-xs text-slate-400">Single-worker crawler, URL discovery, status codes, title, meta description, links, images & storage.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 5: Modular SEO Analysis Engine</h4>
-                      <p className="text-xs text-slate-400">Technical, on-page, content, link & image rule analyzers, duplicate detection, issue management dashboard.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 6: SEO Scoring Engine & Analytics Dashboard</h4>
-                      <p className="text-xs text-slate-400">Transparent weighted scoring (Technical 25%, On-Page 25%, Content 20%, Links 15%, Performance 10%, Mobile 5%), health grade A-F, radar diagnostics, and priority actionable recommendations.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 7: Background Jobs & Distributed Processing</h4>
-                      <p className="text-xs text-slate-400">Celery distributed crawl tasks, Redis broker integration, crawl_tasks per-URL tracking, exponential backoff retries, and live worker queue activity drawer.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 8: Historical Snapshots, Competitor Intelligence & Scheduled Audits</h4>
-                      <p className="text-xs text-slate-400">Immutable audit snapshots with score trend tracking, multi-domain competitor benchmarking, and Celery Beat scheduled recurring scan automation.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-emerald-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 9: Reports, Notifications & Intelligence Suite</h4>
-                      <p className="text-xs text-slate-400">PDF/CSV/JSON report generation via ReportLab, in-app notification bell with crawl-complete alerts, competitor benchmarking UI, audit history charts, and scheduled scan configuration panel.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full font-medium border border-emerald-500/20">Completed</span>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-violet-500/30">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle2 className="w-5 h-5 text-violet-400" />
-                    <div>
-                      <h4 className="font-semibold text-sm text-white">Phase 10: AI Intelligence Suite (Current)</h4>
-                      <p className="text-xs text-slate-400">Rule-based AI recommendation engine with optional OpenAI enrichment, content gap analysis (thin content, heading issues, keyword cannibalization), structured JSON logging with rotating file handler, 6 new test modules, Celery Beat scheduler, and Docker resource limits.</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-3 py-1 bg-violet-500/10 text-violet-400 rounded-full font-medium border border-violet-500/20">Active</span>
-                </div>
-              </div>
-            </div>
           </>
         )}
       </main>
